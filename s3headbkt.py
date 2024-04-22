@@ -27,4 +27,4 @@ current_region = session.region_name
 # Create a high-level resource from custom session
 client = session.client('s3')
 
-verifyBucketName(client, 'demobkt')
+verifyBucketName(client, 'demo--bkt-serverless')
