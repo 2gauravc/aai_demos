@@ -7,6 +7,7 @@ session = boto3.Session()
 current_region = session.region_name
 print("current Region is", current_region)
 
+# Low level client
 # Initialize the S3 client
 s3 = session.client('s3')
 
