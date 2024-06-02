@@ -10,6 +10,9 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.S3Exception;
 import software.amazon.awssdk.services.s3.model.HeadBucketRequest;
 import software.amazon.awssdk.services.s3.model.HeadBucketResponse;
+import software.amazon.awssdk.services.s3.model.CreateBucketConfiguration;
+import software.amazon.awssdk.regions.Region;
+
 
 public class Handler {
     private final S3Client s3Client;
@@ -20,10 +23,10 @@ public class Handler {
 
     public void sendRequest() {
         //Check if bucket exists 
-        checkBucketExists (s3Client, "amazon" );
+        //checkBucketExists (s3Client, "amazon" );
         
         //create bucket using the s3Client
-        //bucketName = createBucket(s3Client);
+        String bucketName = createBucket(s3Client, "demobkt1977-13");
         
         //Upload object to the newly created bucket 
         //key = uploadObject(s3Client, bucketName);
@@ -39,8 +42,11 @@ public class Handler {
         System.out.println("Exiting...");
     }
 
-    public static String createBucket(S3Client s3Client) {
-        String bucketName = "bucketwithjava" + System.currentTimeMillis();
+    public static String createBucket(S3Client s3Client, String bucketName) {
+         Region region = Region.US_EAST_2;
+         if (bucketName == null) {
+            bucketName = "bucketwithjava" + System.currentTimeMillis();
+        }
         try {
             s3Client.createBucket(CreateBucketRequest
                     .builder()
@@ -102,22 +108,29 @@ public class Handler {
                 .bucket(bucketName)
                 .build();
             HeadBucketResponse result=s3Client.headBucket(request);
-            if (result.sdkHttpResponse().statusCode() == 200) { System.out.println("Bucket existing!"); }
+            if (result.sdkHttpResponse().statusCode() == 200) { System.out.println("Bucket exists and is owned by this account."); }
             
         } catch (S3Exception e) {
             switch (e.statusCode()) {
                 case 404:
-                    System.out.println("Error Code 404. No such bucket existing.");
+                    System.out.println("Error Code 404. No such bucket exists.");
                     System.out.printf("%n");
                     break;
                 case 400:
-                    System.out.println("Error Code 400. Attempted to access a bucket from a Region other than where it exists.");
+                    System.out.println("Error Code 400. Bucket exists not in this region.");
                     System.out.printf("%n");
                     break;
                 case 403:
-                    System.out.println("Error Code 403. Permission errors in accessing bucket...");
+                    System.out.println("Error Code 403. Permission errors in accessing bucket. Likely bucket owned by another account.");
                     System.out.printf("%n");
                     break;
+                
+                case 301:
+                    System.out.println("Error Code 301. Bucket exists; not in region...");
+                    System.out.printf("%n");
+                    break;
+                
+                
                 default: 
                     System.err.println(e.awsErrorDetails().errorMessage());
                     System.out.printf("%n");
