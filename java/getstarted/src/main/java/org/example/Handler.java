@@ -12,6 +12,7 @@ import software.amazon.awssdk.services.s3.model.HeadBucketRequest;
 import software.amazon.awssdk.services.s3.model.HeadBucketResponse;
 import software.amazon.awssdk.services.s3.model.CreateBucketConfiguration;
 import software.amazon.awssdk.regions.Region;
+import java.util.Scanner;
 //import software.amazon.awssdk.services.s3.model.ResponseHeaderOverrides;
 //import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 
@@ -22,30 +23,18 @@ public class Handler {
     public Handler() {
         s3Client = DependencyFactory.s3Client();
     }
-
-    public void sendRequest() {
-        //Check if bucket exists 
-        checkBucketExists (s3Client, "amazon" );
-        
-        //create bucket using the s3Client
-        //String bucketName = createBucket(s3Client, "demotebkt2812");
-        
-        //Upload object to the newly created bucket 
-        //key = uploadObject(s3Client, bucketName);
-        
-        //Delete bucket and clean-up 
-        //cleanUp(s3Client, bucketName, key);
-        
-        //Get Object
-        //getObject(s3Client, "demotebkt2812", "key.txt");
-
+    public void closeS3Client() {
+        if (s3Client != null) {
         System.out.println("Closing the connection to {S3}");
         s3Client.close();
-        System.out.println("Connection closed");
-        System.out.println("Exiting...");
+        }
     }
 
-    public static void checkBucketExists(S3Client s3Client, String bucketName) {
+    public void checkBucketExists() { //S3Client s3Client, String bucketName
+        Scanner scanner = new Scanner(System.in);  // Create a Scanner object
+        System.out.println("Enter bucket name:");
+        String bucketName = scanner.nextLine();  // Read user input
+
         System.out.println("Checking if bucket exists. Bucket Name: " + bucketName);
         System.out.printf("%n");
         try {
@@ -86,11 +75,13 @@ public class Handler {
     }
     }
 
-    public static String createBucket(S3Client s3Client, String bucketName) {
-         Region region = Region.US_EAST_2;
-         if (bucketName == null) {
-            bucketName = "bucketwithjava" + System.currentTimeMillis();
-        }
+    public String createBucket() { //S3Client s3Client, String bucketName
+        
+        Region region = Region.US_EAST_2;
+        String bucketName = "bucketwithjava" + System.currentTimeMillis();
+        System.out.println("Creating new bucket with Name: " + bucketName + " in region " + region);
+
+        
         try {
             s3Client.createBucket(CreateBucketRequest
                     .builder()
@@ -110,7 +101,12 @@ public class Handler {
         }
     }
 
-    public static String uploadObject(S3Client s3Client, String bucketName) {
+    public String uploadObject() { //S3Client s3Client, String bucketName
+    Scanner scanner = new Scanner(System.in);  // Create a Scanner object
+    System.out.println("Enter bucket name:");
+    String bucketName = scanner.nextLine();  // Read user input
+
+    
     System.out.println("Uploading Object..");
     System.out.printf("%n");
     String key = "testobject";
@@ -123,7 +119,7 @@ public class Handler {
     return key;
     } 
 
-    public static void cleanUp(S3Client s3Client, String bucketName, String keyName) {
+/*    public void cleanUp() { //S3Client s3Client, String bucketName, String keyName
         System.out.println("Cleaning up...");
         try {
             System.out.println("Deleting object: " + keyName);
@@ -143,7 +139,7 @@ public class Handler {
         System.out.printf("%n");
     }
     
-    
+*/  
     
     //get object 
     //public static void getObject(S3Client s3Client, String bucketName, String key) {
