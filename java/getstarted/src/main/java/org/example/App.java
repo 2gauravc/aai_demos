@@ -48,6 +48,7 @@ public class App {
                     System.out.println("Exiting application.");
                     logger.info("Application ends");
                     scanner.close();
+                    handler.closeS3Client();
                     return;
                 
                 default:
