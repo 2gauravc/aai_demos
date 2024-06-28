@@ -32,4 +32,4 @@ print("Current region is: {}".format(current_region))
 # Create a high-level resource from custom session
 client = session.client('s3')
 
-verifyBucketName(client, 'demobkt1977-12')
+verifyBucketName(client, 'demobkt1977')

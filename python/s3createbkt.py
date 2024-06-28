@@ -10,7 +10,7 @@ bkt_create_region = 'us-east-2'
 
 bkt_name = 'demobkt1977-12'
 print ("Current region is: ", current_region)
-print ("Creating bucket in region : ", bkt_create_region)
+print ("Creating bucket {} in region {} ".format(bkt_name,bkt_create_region))
 
 
 # Create a high-level resource from custom session
