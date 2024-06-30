@@ -9,13 +9,17 @@ logger = logging.getLogger(__name__)
 def get_object(bucket, object_key):
     try:
         obj = bucket.Object(object_key)
-        body = obj.get()['Body'].read()
+        response = obj.get()
+        body = response['Body'].read()
+        size = response['ContentLength']
+        content_type = response['ContentType']
+        
         logger.info("Got object '%s' from bucket '%s'.", object_key, bucket.name)
     except ClientError:
         logger.exception("Couldn't get object '%s' from bucket '%s'.", object_key, bucket.name)
         raise
     else:
-        return body
+        return body, size, content_type
 
 # Create S3 resource using custom session
 session = boto3.session.Session()
@@ -23,8 +27,9 @@ session = boto3.session.Session()
 # Create a high-level resource from custom session
 resource = session.resource('s3')
 bucket = resource.Bucket('demotebkt2812')
-object_key= 'key.txt'
+object_key= 'airport-codes.csv'
 
-body = get_object(bucket, object_key) 
-print(body) 
+body,size, content_type = get_object(bucket, object_key) 
+print("Object size is {} MB".format(size/1000000)) 
+print("Content Type is {}".format(content_type))
 
