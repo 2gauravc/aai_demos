@@ -50,21 +50,15 @@ public class Handler {
                     System.out.println("Error Code 404. No such bucket exists.");
                     System.out.printf("%n");
                     break;
-                case 400:
-                    System.out.println("Error Code 400. Bucket exists not in this region.");
-                    System.out.printf("%n");
-                    break;
                 case 403:
                     System.out.println("Error Code 403. Permission errors in accessing bucket. Likely bucket owned by another account.");
                     System.out.printf("%n");
                     break;
-                
+                case 400:
                 case 301:
-                    System.out.println("Error Code 301. Bucket exists; not in region...");
+                    System.out.println("Error Code 400/301. Bucket exists; not in this region OR bad request");
                     System.out.printf("%n");
                     break;
-                
-                
                 default: 
                     System.err.println(e.awsErrorDetails().errorMessage());
                     System.out.printf("%n");
