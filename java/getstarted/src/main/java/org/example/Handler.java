@@ -1,5 +1,9 @@
 package org.example;
 
+
+import software.amazon.awssdk.core.ResponseBytes;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
@@ -13,6 +17,10 @@ import software.amazon.awssdk.services.s3.model.HeadBucketResponse;
 import software.amazon.awssdk.services.s3.model.CreateBucketConfiguration;
 import software.amazon.awssdk.regions.Region;
 import java.util.Scanner;
+import java.io.OutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 //import software.amazon.awssdk.services.s3.model.ResponseHeaderOverrides;
 //import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 
@@ -99,7 +107,9 @@ public class Handler {
     Scanner scanner = new Scanner(System.in);  // Create a Scanner object
     System.out.println("Enter bucket name:");
     String bucketName = scanner.nextLine();  // Read user input
-
+    scanner.close();
+    
+    
     
     System.out.println("Uploading Object..");
     System.out.printf("%n");
@@ -113,7 +123,49 @@ public class Handler {
     return key;
     } 
 
-/*    public void cleanUp() { //S3Client s3Client, String bucketName, String keyName
+
+    public void getObject() { //S3Client s3Client, String bucketName, String key
+        System.out.println("Inside getObject");
+        Scanner scanner = new Scanner(System.in);  // Create a Scanner object
+        System.out.println("Enter bucket name:");
+        String bucketName = scanner.nextLine();  // Read user input
+        System.out.println("Enter object key:");
+        String keyName = scanner.nextLine();  // Read user input
+        //scanner.close();
+        
+        String path = "/home/ec2-user/environment/aai_demos/java/getstarted/tempfiles/airport-codes.csv";
+        
+        getObjectBytes(s3Client, bucketName, keyName, path);
+        
+    }
+
+    public static void getObjectBytes(S3Client s3, String bucketName, String keyName, String path) {
+        try {
+            GetObjectRequest objectRequest = GetObjectRequest
+                    .builder()
+                    .key(keyName)
+                    .bucket(bucketName)
+                    .build();
+
+            ResponseBytes<GetObjectResponse> objectBytes = s3.getObjectAsBytes(objectRequest);
+            byte[] data = objectBytes.asByteArray();
+
+            // Write the data to a local file.
+            File myFile = new File(path);
+            OutputStream os = new FileOutputStream(myFile);
+            os.write(data);
+            System.out.println("Successfully obtained bytes from an S3 object");
+            os.close();
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } catch (S3Exception e) {
+            System.err.println(e.awsErrorDetails().errorMessage());
+            System.exit(1);
+        }
+    }
+
+/*  public void cleanUp() { //S3Client s3Client, String bucketName, String keyName
         System.out.println("Cleaning up...");
         try {
             System.out.println("Deleting object: " + keyName);
@@ -135,21 +187,5 @@ public class Handler {
     
 */  
     
-    //get object 
-    //public static void getObject(S3Client s3Client, String bucketName, String key) {
-    //    System.out.println("Checking if bucket exists. Bucket Name: " + bucketName);
-    //    System.out.printf("%n");
-    //    try {
-    //         ResponseHeaderOverrides headerOverrides = new ResponseHeaderOverrides()
-    //            .withCacheControl("No-cache")
-    //            .withContentDisposition("attachment; filename=key.txt"); 
-    //       GetObjectRequest getObjectRequest = new GetObjectRequest(bucketName, key)
-    //            .withResponseHeaders(headerOverrides);
 
-    //    headerOverrideObject = s3Client.getObject(getObjectRequest);
-    //    displayTextInputStream(headerOverrideObject.getObjectContent());
-    //    } catch (S3Exception e) {
-    //    System.err.println(e.awsErrorDetails().errorMessage());
-    //    }        
-    //}
 }

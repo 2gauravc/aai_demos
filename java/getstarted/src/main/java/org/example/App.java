@@ -41,7 +41,8 @@ public class App {
                     break; 
                 
                 case 4: 
-                    //handler.getObject();
+                    System.out.println("calling getObject");
+                    handler.getObject();
                     break; 
                 
                 case 5:
