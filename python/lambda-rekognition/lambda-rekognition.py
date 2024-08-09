@@ -21,7 +21,7 @@ def lambda_handler(event, context):
     sourceBucket = event['Records'][0]['s3']['bucket']['name']
     sourceKey = event['Records'][0]['s3']['object']['key']
 
-    print("Initiating amazing image rekognition for key {} in bucket {}".format(sourceKey, sourceBucket))
+    print("Initiating amazing image rekognition v2 for key {} in bucket {}".format(sourceKey, sourceBucket))
 
     # Invoke Rekognition API
     rekognition_client = boto3.client('rekognition')
