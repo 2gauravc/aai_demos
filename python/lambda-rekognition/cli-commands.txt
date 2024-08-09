@@ -1,0 +1,56 @@
+Set-up needed: 
+
+1.	Create a bucket called ‘rekognition-bkt’
+aws s3api create-bucket --bucket rekognition-bkt --region us-east-1
+
+2.	Create a SNS topic demo_topic
+aws sns create-topic --name demo_topic
+
+3.	Subscribe gmail address to topic
+aws sns subscribe --topic-arn arn:aws:sns:us-east-1:123456789012:demo_topic --protocol email --notification-endpoint 2gauravc@gmail.com
+(replace SNS topic arn) 
+
+5.	Create the lambda execution ‘LambdaRekognitionS3SNSRole’ with permissions to: 
+a.	Pull events from S3 
+b.	Call Rekognition service 
+c.	Push to SNS topic demo_topic
+d.	AWSLambdaBasicExecutionRole – this is needed to access and write to CW logs 
+
+Create IAM Role with Trust Policy (lambda can assume)
+aws iam create-role --role-name LambdaRekognitionS3SNSRole --assume-role-policy-document file://trust-policy.json
+
+aws iam attach-role-policy --role-name LambdaRekognitionS3SNSRole --policy-arn arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+aws iam attach-role-policy --role-name LambdaRekognitionS3SNSRole --policy-arn arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
+aws iam attach-role-policy --role-name LambdaRekognitionS3SNSRole --policy-arn arn:aws:iam::aws:policy/AmazonRekognitionFullAccess
+aws iam attach-role-policy --role-name LambdaRekognitionS3SNSRole --policy-arn arn:aws:iam::aws:policy/AmazonSNSFullAccess
+
+
+6.	Add permissions to s3 to trigger lambda: 
+
+aws lambda add-permission \
+    --function-name rekognition-function \
+    --principal s3.amazonaws.com \
+    --statement-id s3invoke \
+    --action "lambda:InvokeFunction" \
+    --source-arn arn:aws:s3:::rekognition-bkt \
+    --source-account 821052193763
+
+7.	Add event trigger for a JPG file upload into recognition-bkt
+
+
+aws s3api put-bucket-notification-configuration \
+    --bucket rekognition-bkt \
+    --notification-configuration file://s3-trigger.json
+
+8.	Create the zip archive ‘zip -r ../lambda-rekognition.zip .’
+9.	Create the environment variable snstopic
+a.	export snstopic=arn:aws:sns:us-east-1:821052193763:demo_topic 
+10.	Create the lambda function: 
+			aws lambda create-function \
+    --function-name rekognition-function \
+    --handler lambda-rekognition.lambda_handler \
+    --runtime python3.8 \
+    --role arn:aws:iam::821052193763:role/LambdaRekognitionS3SNSRole \
+    --environment Variables={SNS_TOPIC=$snstopic} \
+    --zip-file fileb://lambda-rekognition.zip
+1

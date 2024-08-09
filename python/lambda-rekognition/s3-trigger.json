@@ -1,0 +1,18 @@
+{
+    "LambdaFunctionConfigurations": [
+        {
+            "LambdaFunctionArn": "arn:aws:lambda:us-east-1:821052193763:function:rekognition-function",
+            "Events": ["s3:ObjectCreated:*"],
+            "Filter": {
+                "Key": {
+                    "FilterRules": [
+                        {
+                            "Name": "suffix",
+                            "Value": "jpg"
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}
