@@ -22,14 +22,14 @@ def verifyBucketName(s3Client,bucket):
             ## If you receive a 400 error code, a bucket with that name exists 
             ##  in another AWS region.
             raise SystemExit('Error Code 400. Bucket exists not in this region.')
-# Create S3 resource using custom session
+# Create S3 client using custom session
 session = boto3.session.Session(profile_name='default')
 
 # Retrieve region from session object
 current_region = session.region_name
 print("Current region is: {}".format(current_region))
 
-# Create a high-level resource from custom session
+# Create a low level client from custom session
 client = session.client('s3')
 
 verifyBucketName(client, 'demobkt1977')
